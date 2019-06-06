@@ -119,48 +119,72 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   return newRequire;
 })({"scripts.js":[function(require,module,exports) {
 var body = document.body;
+var circle = document.createElement('div');
+circle.style.width = '80px';
+circle.style.height = '80px';
+circle.style.borderRadius = '50%';
+circle.style.backgroundColor = 'blue';
+body.appendChild(circle);
 var rectangle = document.createElement('div');
 rectangle.style.width = '50px';
 rectangle.style.height = '50px';
 rectangle.style.backgroundColor = 'red';
 body.appendChild(rectangle);
-rectangle.addEventListener('click', function (e) {}); // Move on click, snap object
 
-var translateObject = function translateObject(e, element, width, height, body, offsetX, offsetY) {
-  var x = e.pageX - offsetX;
-  var y = e.pageY - offsetY;
-
-  if (x + width > body.clientWidth) {
-    x = body.clientWidth - width;
+var abs = function abs(num) {
+  if (num < -1) {
+    return num * -1;
   }
 
-  if (y + width > body.clientHeight) {
-    y = body.clientHeight - height;
-  }
+  return num;
+};
 
-  element.style.transform = "translate(".concat(x, "px, ").concat(y, "px)");
-}; // on mouse over -> ready to drag -> click - dragging -> on mouse move - translating -> on mouse up - stop dragging
+var dragAndDrop = function dragAndDrop(element, height, width) {
+  var translateObject = function translateObject(e, element, width, height, body, offsetX, offsetY) {
+    var x = e.pageX - offsetX - abs(element.offsetLeft);
+    var y = e.pageY - offsetY - abs(element.offsetTop);
 
+    if (x < -abs(element.offsetLeft)) {
+      x = -abs(element.offsetLeft);
+    }
 
-var offsetX = 0;
-var offsetY = 0;
-var drag = false;
-rectangle.addEventListener('mousedown', function (e) {
-  offsetX = e.offsetX;
-  offsetY = e.offsetY;
-  drag = true;
-});
-body.addEventListener('mousemove', function (e) {
-  if (drag) {
-    translateObject(e, rectangle, 50, 50, body, offsetX, offsetY);
-  }
-});
-rectangle.addEventListener('mouseup', function () {
-  drag = false;
-});
-body.addEventListener('mouseleave', function () {
-  drag = false;
-});
+    if (x + width > body.clientWidth) {
+      x = body.clientWidth - width;
+    }
+
+    if (y + height > body.clientHeight - abs(element.offsetTop)) {
+      y = body.clientHeight - height - abs(element.offsetTop);
+    }
+
+    if (y < -abs(element.offsetTop)) {
+      y = -abs(element.offsetTop);
+    }
+
+    element.style.transform = "translate(".concat(x, "px, ").concat(y, "px)");
+  };
+
+  element.addEventListener('mouseenter', function () {
+    var offsetX = 0;
+    var offsetY = 0;
+    var drag = false;
+    element.addEventListener('mousedown', function (e) {
+      offsetX = e.offsetX;
+      offsetY = e.offsetY;
+      drag = true;
+    });
+    body.addEventListener('mousemove', function (e) {
+      if (drag) {
+        translateObject(e, element, height, width, body, offsetX, offsetY);
+      }
+    });
+    body.addEventListener('mouseup', function () {
+      drag = false;
+    });
+  });
+};
+
+dragAndDrop(rectangle, 50, 50);
+dragAndDrop(circle, 80, 80);
 },{}],"../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
