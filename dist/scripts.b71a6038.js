@@ -119,17 +119,23 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   return newRequire;
 })({"scripts.js":[function(require,module,exports) {
 var body = document.body;
+var rectangle = document.createElement('div');
+rectangle.style.width = '150px';
+rectangle.style.height = '50px';
+rectangle.style.backgroundColor = '#5cc9f5';
+body.appendChild(rectangle);
 var circle = document.createElement('div');
 circle.style.width = '80px';
 circle.style.height = '80px';
 circle.style.borderRadius = '50%';
-circle.style.backgroundColor = 'blue';
+circle.style.backgroundColor = '#6638f0';
 body.appendChild(circle);
-var rectangle = document.createElement('div');
-rectangle.style.width = '50px';
-rectangle.style.height = '50px';
-rectangle.style.backgroundColor = 'red';
-body.appendChild(rectangle);
+var square = document.createElement('div');
+square.style.width = '50px';
+square.style.height = '50px';
+square.style.backgroundColor = '#4af2a1';
+square.style.position = 'relative';
+body.appendChild(square);
 
 var abs = function abs(num) {
   if (num < -1) {
@@ -139,8 +145,18 @@ var abs = function abs(num) {
   return num;
 };
 
-var dragAndDrop = function dragAndDrop(element, height, width) {
-  var translateObject = function translateObject(e, element, width, height, body, offsetX, offsetY) {
+var dragAndDrop = function dragAndDrop(element) {
+  var height = parseInt(element.style.height, 10);
+  var width = parseInt(element.style.width, 10);
+
+  var translateObject = function translateObject(_ref) {
+    var e = _ref.e,
+        element = _ref.element,
+        width = _ref.width,
+        height = _ref.height,
+        offsetX = _ref.offsetX,
+        offsetY = _ref.offsetY;
+    //console.log(element.offsetTop); // initial y position
     var x = e.pageX - offsetX - abs(element.offsetLeft);
     var y = e.pageY - offsetY - abs(element.offsetTop);
 
@@ -160,7 +176,7 @@ var dragAndDrop = function dragAndDrop(element, height, width) {
       y = -abs(element.offsetTop);
     }
 
-    element.style.transform = "translate(".concat(x, "px, ").concat(y, "px)");
+    element.style.transform = "translate(".concat(x, "px, ").concat(y, "px)"); // translates form the top corner of the div
   };
 
   element.addEventListener('mouseenter', function () {
@@ -174,7 +190,14 @@ var dragAndDrop = function dragAndDrop(element, height, width) {
     });
     body.addEventListener('mousemove', function (e) {
       if (drag) {
-        translateObject(e, element, height, width, body, offsetX, offsetY);
+        translateObject({
+          e: e,
+          element: element,
+          width: width,
+          height: height,
+          offsetX: offsetX,
+          offsetY: offsetY
+        });
       }
     });
     body.addEventListener('mouseup', function () {
@@ -183,8 +206,42 @@ var dragAndDrop = function dragAndDrop(element, height, width) {
   });
 };
 
-dragAndDrop(rectangle, 50, 50);
-dragAndDrop(circle, 80, 80);
+var move = function move(element) {
+  var height = parseInt(element.style.height, 10);
+  var width = parseInt(element.style.width, 10);
+  var x = 100;
+  var maxPos = 500;
+  element.style.left = x + 'px'; // let moveRight = setInterval(() => {
+  //   if (x + width < body.clientWidth) {
+  //     x++;
+  //     element.style.left = x + 'px';
+  //   } else {
+  //     clearInterval(moveRight);
+  //   }
+  //   console.log(x);
+  // }, 1);
+
+  var moveLeft = setInterval(function () {
+    if (x > 0) {
+      x--;
+      element.style.left = x + 'px';
+    } else {
+      clearInterval(moveLeft);
+    }
+  }, 1);
+  var y = 0;
+  setInterval(function () {
+    if (y < maxPos) {
+      y++;
+      element.style.top = y + 'px';
+    }
+  }, 50);
+};
+
+dragAndDrop(rectangle);
+dragAndDrop(circle);
+dragAndDrop(square);
+move(square);
 },{}],"../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -213,7 +270,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55688" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64388" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
